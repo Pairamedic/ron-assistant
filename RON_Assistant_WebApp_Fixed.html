@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CasePoint RON Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .btn { display: inline-block; margin: 5px 0; padding: 10px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    .btn:disabled { background-color: #ccc; }
+    .checkbox { margin: 10px 0; }
+    .hidden { display: none; }
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="ron-content"></div>
+    <div style="margin-top: 20px;">
+      <button class="btn" onclick="prevStep()">Back</button>
+      <button class="btn" onclick="nextStep()">Next</button>
+      <button class="btn" onclick="restart()">Restart</button>
+      <button class="btn" onclick="showReferences()">Notarial References</button>
+    </div>
+    <div id="reference" class="hidden">
+      <h2>Notarial Acts & Key Requirements</h2>
+      <div id="ref-data"></div>
+      <button class="btn" onclick="hideReferences()">Close</button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const steps = [
+        "Hello! My name is Elias Aaron Caldwell, and I'm a commissioned Remote Online Notary in Arkansas...",
+        "Do you understand and consent to proceeding with this remote online notarization today in Arkansas?",
+        "Do you understand that this session will be recorded as part of the legal notarial record?",
+        "Are you participating of your own free will?",
+        "Do you understand the contents of the document you are about to sign?",
+        "Do you agree to use an electronic signature for this document?",
+        "Do you understand that by signing electronically, you are legally binding yourself to the terms of the document just as you would with a handwritten signature?",
+        "Checklist: Identity Verification",
+        "Checklist: Certificate Completion",
+        "Checklist: Journal Entry",
+        "✅ You have completed the RON Checklist!"
+      ];
+      const checklists = {
+        7: [
+          "Verify ID with a government-issued photo ID.",
+          "Confirm signer understands the document.",
+          "Ensure signer is acting willingly.",
+          "Ensure both understand the language used.",
+          "Confirm document is complete (no blanks).",
+          "Confirm correct notarial act."
+        ],
+        8: [
+          "Ensure certificate is attached or correct.",
+          "Check venue, date, and signer's name.",
+          "Sign using your commissioned name.",
+          "Affix official seal."
+        ],
+        9: [
+          "Log date/time of notarization.",
+          "Record document type & act performed.",
+          "Record signer’s name, address, and signature.",
+          "Record ID used.",
+          "Note special circumstances if any.",
+          "Record fee charged (if any)."
+        ]
+      };
+      let currentStep = 0;
+
+      function renderStep() {
+        const container = document.getElementById('ron-content');
+        container.classList.remove("hidden");
+        document.getElementById('reference').classList.add('hidden');
+        container.innerHTML = `<h2>Step ${currentStep + 1}</h2><p>${steps[currentStep]}</p>`;
+        if (checklists[currentStep]) {
+          checklists[currentStep].forEach(item => {
+            container.innerHTML += `<div class='checkbox'><label><input type='checkbox'/> ${item}</label></div>`;
+          });
+        }
+      }
+
+      window.nextStep = function () {
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          renderStep();
+        }
+      };
+
+      window.prevStep = function () {
+        if (currentStep > 0) {
+          currentStep--;
+          renderStep();
+        }
+      };
+
+      window.restart = function () {
+        currentStep = 0;
+        renderStep();
+      };
+
+      window.showReferences = function () {
+        document.getElementById('ron-content').classList.add('hidden');
+        document.getElementById('reference').classList.remove('hidden');
+        renderReferences();
+      };
+
+      window.hideReferences = function () {
+        document.getElementById('reference').classList.add('hidden');
+        document.getElementById('ron-content').classList.remove('hidden');
+        renderStep();
+      };
+
+      function renderReferences() {
+        const data = {
+          "Acknowledgment": [
+            "Signer may sign before or in notary's presence.",
+            "No oath required.",
+            "Must appear in person or via remote tech."
+          ],
+          "Jurat": [
+            "Signer must sign in notary’s presence.",
+            "Oath or affirmation is required.",
+            "Identity must be verified."
+          ],
+          "Oath/Affirmation": [
+            "Verbal act only. No signature required.",
+            "Person must appear before notary."
+          ],
+          "Copy Certification": [
+            "Notary must supervise or create copy.",
+            "Not valid for vital/public records."
+          ],
+          "Signature by Mark": [
+            "Signer uses a mark instead of full signature.",
+            "Requires 1 disinterested witness.",
+            "Certificate must note witness and mark."
+          ],
+          "Signature by Third Party": [
+            "Signer directs another to sign for them.",
+            "Requires 2 disinterested witnesses.",
+            "All must be present and certificate must reflect this."
+          ],
+          "Special Circumstances": [
+            "Used for disability or inability to sign.",
+            "Notarial certificate must include specific language.",
+            "Witness rules apply as described above."
+          ]
+        };
+        const ref = document.getElementById("ref-data");
+        ref.innerHTML = Object.entries(data).map(([title, list]) => `
+          <h3>${title}</h3><ul>${list.map(item => `<li>${item}</li>`).join("")}</ul>
+        `).join("");
+      }
+
+      renderStep();
+    });
+  </script>
+</body>
+</html>
