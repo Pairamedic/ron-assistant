@@ -2,21 +2,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CasePoint RON Assistant</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-    .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .btn { display: inline-block; margin: 5px 0; padding: 10px 15px; background-color: #3f51b5; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-    .btn:disabled { background-color: #ccc; }
-    .checkbox { margin: 10px 0; }
-    .hidden { display: none; }
-    ul { padding-left: 20px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Arkansas Notary Assistant – RON, IPEN & Special Circumstances</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        h1, h2, h3 { color: #3f51b5; }
+        .button-group { margin-bottom: 20px; }
+        button {
+            padding: 10px 15px; background-color: #3f51b5; color: white; border: none;
+            border-radius: 5px; margin-right: 10px; cursor: pointer;
+        }
+        button:hover { background-color: #2c3e90; }
+        .section {
+            display: none; background: white; padding: 20px; border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .section.active { display: block; }
+        .scroll-box {
+            max-height: 300px; overflow-y: auto; background: #eef;
+            padding: 15px; border-radius: 8px; margin-top: 10px; white-space: pre-wrap;
+        }
+        .template-box {
+            background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px;
+            border-radius: 8px; margin: 10px 0;
+        }
+        ul { line-height: 1.7; }
+    </style>
+    <script>
+        function toggleSection(id) {
+  document.getElementById('ron-checklist').classList.remove('active');
+    document.getElementById('cert-generator').classList.remove('active');
+            document.getElementById('ron').classList.remove('active');
+            document.getElementById('ipen').classList.remove('active');
+            document.getElementById('specials').classList.remove('active');
+            document.getElementById(id).classList.add('active');
+        }
+    </script>
 </head>
 <body>
-  <div class="container">
+
+<h1>Arkansas Notary Assistant</h1>
+<div class="button-group">
+<button onclick="toggleSection('ron-checklist')">RON Checklist</button>
+
+    <button onclick="toggleSection('ron')">Remote Online Notarization (RON)</button>
+    <button onclick="toggleSection('ipen')">In-Person Electronic Notarization (IPEN)</button>
+    <button onclick="toggleSection('specials')">Special Circumstances</button>
+</div>
+
+
+<div class="button-group">
+    <button onclick="toggleSection('cert-generator')">Generate Notarial Certificate</button>
+</div>
+
+<div id="cert-generator" class="section">
+  <h2>Notarial Certificate Generator (RON, IPEN, Physical)</h2>
+
+  <label for="method">Select Notarial Method:</label>
+  <select id="method" style="width: 100%; margin-bottom: 10px;">
+    <option value="ron">Remote Online Notarization (RON)</option>
+    <option value="ipen">In-Person Electronic Notarization (IPEN)</option>
+    <option value="physical">Traditional Physical Notarization</option>
+  </select>
+
+  <label for="act">Select Notarial Act:</label>
+  <select id="act" onchange="toggleExtraFields()" style="width: 100%; margin-bottom: 10px;">
+    <option value="">-- Choose an act --</option>
+    <option value="ack-individual">Acknowledgment – Individual</option>
+    <option value="ack-representative">Acknowledgment – Representative</option>
+    <option value="jurat">Jurat</option>
+    <option value="oath">Oath / Affirmation</option>
+    <option value="copy-cert">Certified Copy</option>
+    <option value="sig-witness">Signature Witnessing</option>
+    <option value="mark">Signature by Mark</option>
+    <option value="third-party">Signature by Third Party</option>
+    <option value="refusal">Refusal to Notarize</option>
+    <option value="no-cert">No Certificate Provided</option>
+  </select>
+
+  <label for="signer">Signer’s Name:</label>
+  <input type="text" id="signer" style="width:100%; margin-bottom: 10px;"><br>
+
+  <label for="county">County You’re In:</label>
+  <input type="text" id="county" style="width:100%; margin-bottom: 10px;"><br>
+
+  <label for="date">Date:</label>
+  <input type="date" id="date" style="width:100%; margin-bottom: 10px;"><br>
+
+  <div id="extra-fields"></div>
+
+  <button onclick="generateCertificate()" style="margin-top:10px;">Generate Certificate</button>
+  <button onclick="downloadPDF()" style="margin-left: 10px;">Export to PDF</button>
+
+  <div class="scroll-box" id="output" style="margin-top:20px; white-space:pre-wrap;"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+function toggleExtraFields() {
+  const act = document.getElementById("act").value;
+  const extras = document.getElementById("extra-fields");
+  extras.innerHTML = "";
+
+  if (["ack-representative", "third-party"].includes(act)) {
+    extras.innerHTML += '<label for="principal">Principal’s Name:</label><input type="text" id="principal" style="width:100%; margin-bottom:10px;"><br>';
+  }
+  if (["mark", "third-party"].includes(act)) {
+    extras.innerHTML += '<label for="witnesses">Disinterested Witness(es):</label><input type="text" id="witnesses" style="width:100%; margin-bottom:10px;"><br>';
+  }
+  if (["third-party"].includes(act)) {
+    extras.innerHTML += '<label for="thirdparty">Third Party Signer’s Name:</label><input type="text" id="thirdparty" style="width:100%; margin-bottom:10px;"><br>';
+  }
+}
+
+function generateCertificate() {
+  const method = document.getElementById("method").value;
+  const act = document.getElementById("act").value;
+  const signer = document.getElementById("signer").value || "[Name of Signer]";
+  const county = document.getElementById("county").value || "[County]";
+  const date = document.getElementById("date").value || "[Date]";
+  const principal = document.getElementById("principal") ? document.getElementById("principal").value || "[Principal]" : "";
+  const witnesses = document.getElementById("witnesses") ? document.getElementById("witnesses").value || "[Witnesses]" : "";
+  const thirdparty = document.getElementById("thirdparty") ? document.getElementById("thirdparty").value || "[Third Party]" : "";
+
+  
+  let notaryTitle = "Notary Public";
+  if (method === "ron" || method === "ipen") {
+    notaryTitle = "Electronic Notary Public";
+  }
+
+  let body = "";
+  let methodText = {
+    ron: "by means of communication technology",
+    ipen: "in person and electronically signed",
+    physical: "in person with ink signature"
+  };
+
+  switch (act) {
+    case "refusal":
+      body = `This is to certify that on ${date}, I, Elias Aaron Caldwell, ${notaryTitle} for the State of Arkansas, refused to notarize a document for ${signer} due to: [Reason].`;
+      break;
+    case "no-cert":
+      body = `This document, presented by ${signer} on ${date}, did not include a required notarial certificate. It was returned without notarization pending correction.`;
+      break;
+
+    case "ack-individual":
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who appeared and affirmed that they are the individual who executed the record.`;
+      break;
+    case "ack-representative":
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, as [Title/Capacity] for ${principal}, who affirmed that they executed the record in that capacity.`;
+      break;
+    case "jurat":
+      body = `Signed and sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who provided satisfactory evidence of identity.`;
+      break;
+    case "oath":
+      body = `Sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who affirmed the truth of the statement made.`;
+      break;
+    case "copy-cert":
+      body = `On ${date}, I certify that the attached is a true, correct, and complete copy of the original presented to me ${methodText[method]} by ${signer}.`;
+      break;
+    case "sig-witness":
+      body = `On ${date}, ${signer} appeared ${methodText[method]} and signed the document in my presence for the stated purpose.`;
+      break;
+    case "mark":
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who signed by mark in the presence of ${witnesses}.`;
+      break;
+    case "third-party":
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty}, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
+      break;
+    default:
+      body = "Please select a valid act.";
+  }
+
+  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:
+
+___________________________`;
+
+  document.getElementById("output").innerText = cert;
+}
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const text = document.getElementById("output").innerText || "Please generate a certificate first.";
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, 15, 20);
+  doc.save("Notarial_Certificate_Elias_Caldwell.pdf");
+}
+</script>
+
+
+
+
+<div id="ron" class="section active">
+    <h2>Remote Online Notarization (RON)</h2>
+    <ul>
+        <li>Confirm you’re in Arkansas and the signer is located in the U.S.</li>
+        <li>Use BlueNotary with KBA + credential verification.</li>
+        <li>Record session, verify ID, observe signing, attach RON certificate.</li>
+        <li>Apply e-seal and log the act in your journal.</li>
+    </ul>
+    <h3>RON Script</h3>
+    <div class="scroll-box">
+        Hello! My name is Elias Aaron Caldwell, and I’m a commissioned Remote Online Notary in the State of Arkansas. I'm authorized to perform this notarization remotely for documents intended for use anywhere in the United States. Before we begin, I'd like to address a few important points: *Proceed to ROM checklist*
+    </div>
+
+    <h3>RON Certificate Templates</h3>
+    <div class="template-box"><b>RON Jurat:</b><br>
+State of Arkansas<br>County of ________<br><br>
+Subscribed and sworn to before me by means of communication technology this ___ day of _______, 20__, by __________________, who appeared before me pursuant to Arkansas Code § 21-14-301.<br><br>Notary Public
+    </div>
+    <div class="template-box"><b>RON Acknowledgment:</b><br>
+State of Arkansas<br>County of ________<br><br>
+On this ___ day of _______, 20__, before me appeared __________________ via audio-visual communication, who acknowledged executing the document voluntarily under Arkansas Code § 21-14-301.<br><br>Notary Public
+    </div>
+    <div class="template-box"><b>RON Certified Copy:</b><br>
+State of Arkansas<br>County of ________<br><br>
+This is a true and correct copy of a document submitted to me remotely by __________________ on this ___ day of _______, 20__, per Arkansas Code § 21-14-301.<br><br>Notary Public
+    </div>
+</div>
+
+<div id="ipen" class="section">
+    <h2>In-Person Electronic Notarization (IPEN)</h2>
+    <ul>
+        <li>You and the signer must be physically present.</li>
+        <li>Use BlueNotary for e-signature and e-seal application.</li>
+        <li>Verify ID, observe signing, apply proper certificate.</li>
+        <li>Log the act in your journal (retain 5 years).</li>
+    </ul>
+    <h3>IPEN Script</h3>
+    <div class="scroll-box">
+        Hi, my name is [Your Name], and I’m a commissioned electronic notary public in Arkansas.
+
+        We are physically present together today in [County Name], Arkansas, as required by law.
+        
+        Please present your valid government-issued ID.
+        [Verify ID and log in journal]
+        
+        Please review and sign the document electronically when ready.
+        Do you affirm that the contents are true and correct?
+        
+        I’ll now apply my eSeal and finalize this notarization. You will receive a copy of the completed document.
+    </div>
+
+    <h3>IPEN Certificate Templates</h3>
+    <div class="template-box"><b>Traditional Jurat:</b><br>
+Subscribed and sworn to before me this ___ day of _______, 20__, by __________________.<br><br>Notary Public
+    </div>
+    <div class="template-box"><b>Traditional Acknowledgment:</b><br>
+On this ___ day of _______, 20__, before me appeared __________________, who acknowledged executing the document.<br><br>Notary Public
+    </div>
+    <div class="template-box"><b>Certified Copy:</b><br>
+I certify this is a true and correct copy of a document presented to me on this ___ day of _______, 20__, by __________________.<br><br>Notary Public
+    </div>
+</div>
+
+<div id="specials" class="section">
+    <h2>Special Circumstances (Arkansas Handbook)</h2>
+    <h3>1. Signers Who Use a Mark</h3>
+    <ul>
+        <li>Two impartial witnesses must observe and sign the document and journal.</li>
+        <li>Certificate must say: “Signature affixed by mark in presence of [witness names].”</li>
+    </ul>
+    <h3>2. Physically Unable to Sign</h3>
+    <ul>
+        <li>Signer may direct a designee to sign.</li>
+        <li>Certificate must say: “Signature affixed by [Designee] at direction of [Signer].”</li>
+    </ul>
+    <h3>3. Interpreters</h3>
+    <ul>
+        <li>Permitted if the notary understands the interpreter’s language.</li>
+        <li>Interpreter identity must be logged in the journal.</li>
+    </ul>
+    <h3>4. Blind or Illiterate Signers</h3>
+    <ul>
+        <li>Document must be read aloud in full by the notary.</li>
+        <li>Signer must confirm understanding aloud.</li>
+    </ul>
+    <h3>5. Credible Witnesses</h3>
+    <ul>
+        <li>One or two disinterested witnesses may verify identity for signers lacking ID.</li>
+        <li>Witnesses must sign the journal and may be sworn under oath.</li>
+    </ul>
+</div>
+
+<div id="ron-checklist" class="section">
+<div class="container">
     <div id="ron-content"></div>
     <div style="margin-top: 20px;">
       <button class="btn" onclick="prevStep()">Back</button>
@@ -30,7 +301,8 @@
       <button class="btn" onclick="hideReferences()">Close</button>
     </div>
   </div>
-  <script>
+</div>
+<script>
     document.addEventListener("DOMContentLoaded", function () {
       const steps = [
         "Hello! My name is Elias Aaron Caldwell, and I'm a commissioned Remote Online Notary in Arkansas...",
