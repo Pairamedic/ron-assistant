@@ -79,6 +79,10 @@
     <option value="third-party">Signature by Third Party</option>
     <option value="refusal">Refusal to Notarize</option>
     <option value="no-cert">No Certificate Provided</option>
+    <option value="selfprove-ron">Self-Proving Affidavit – RON</option>
+    <option value="selfprove-ipen">Self-Proving Affidavit – IPEN</option>
+    <option value="selfprove-physical">Self-Proving Affidavit – Physical</option>
+
   </select>
 
   <label for="signer">Signer’s Name:</label>
@@ -171,6 +175,15 @@ function generateCertificate() {
     case "third-party":
       body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty}, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
       break;
+    case "selfprove-ron":
+      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me by means of communication technology.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+  break;
+    case "selfprove-ipen":
+      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person and electronically signed.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+  break;
+    case "selfprove-physical":
+      body = `Before me, Elias Aaron Caldwell, Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person with ink signature.\n\n___________________________\nElias Aaron Caldwell, Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+  break;
     default:
       body = "Please select a valid act.";
   }
@@ -285,7 +298,21 @@ I certify this is a true and correct copy of a document presented to me on this 
         <li>One or two disinterested witnesses may verify identity for signers lacking ID.</li>
         <li>Witnesses must sign the journal and may be sworn under oath.</li>
     </ul>
+    <h3>6. Wills and Witnesses</h3>
+<ul>
+  <li>A will must be signed by the testator and two competent witnesses in Arkansas.</li>
+  <li>Witnesses must be present at the same time for the testator’s signing and their own signing.</li>
+  <li>Witness ID verification is strongly recommended.</li>
+  <li>Self-Proving Affidavit notarization streamlines probate but is optional.</li>
+  <li>§ 28-25-102: Will must be written, signed by the testator (or by someone else at their direction if necessary).</li>
+  <li>§ 28-25-103: At least two (2) witnesses must watch the testator sign OR hear them acknowledge the signature.</li>
+  <li>AND the witnesses must sign in the presence of the testator and each other.</li>
+  <li>§ 28-25-106: (Optional) A notarized self-proving affidavit can be attached to avoid needing the witnesses to come to court later.</li>
+</ul>
 </div>
+
+
+</ul>
 
 <div id="ron-checklist" class="section">
 <div class="container">
@@ -295,6 +322,60 @@ I certify this is a true and correct copy of a document presented to me on this 
       <button class="btn" onclick="nextStep()">Next</button>
       <button class="btn" onclick="restart()">Restart</button>
       <button class="btn" onclick="showReferences()">Notarial References</button>
+      <!-- BEGIN: Accordion Oath Scripts Section -->
+
+<div style="margin-top: 20px;">
+  <h3>Common Oath / Affirmation Scripts</h3>
+
+  <div style="margin-bottom: 10px;">
+    <button onclick="toggleOath('oath1')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Self-Proving Affidavit Oath</button>
+    <div id="oath1" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
+      "Do you solemnly swear or affirm, under penalty of perjury, that the document you have signed is your Last Will and Testament, that you signed it voluntarily, and that the witnesses signed in your presence and at your request?"
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <button onclick="toggleOath('oath2')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Standard Jurat Oath</button>
+    <div id="oath2" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
+      "Do you swear or affirm under penalty of perjury that the statements in this document are true and correct to the best of your knowledge and belief?"
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <button onclick="toggleOath('oath3')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Copy Certification Oath</button>
+    <div id="oath3" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
+      "Do you swear or affirm that the copy presented is a true, complete, and accurate reproduction of the original document?"
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <button onclick="toggleOath('oath4')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Signature by Mark Oath</button>
+    <div id="oath4" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
+      "Do you swear or affirm that you are signing this document voluntarily and understand its contents, with the assistance of the identified impartial witnesses?"
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <button onclick="toggleOath('oath5')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Third Party Signing Oath</button>
+    <div id="oath5" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
+      "Do you swear or affirm that you have authorized this individual to sign this document on your behalf, and that the signing is voluntary and made with your full consent?"
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleOath(id) {
+  const oath = document.getElementById(id);
+  if (oath.style.display === "none") {
+    oath.style.display = "block";
+  } else {
+    oath.style.display = "none";
+  }
+}
+</script>
+
+<!-- END: Accordion Oath Scripts Section -->
     </div>
     <div id="reference" class="hidden">
       <h2>Notarial Acts & Key Requirements</h2>
@@ -321,6 +402,7 @@ I certify this is a true and correct copy of a document presented to me on this 
       const checklists = {
         7: [
           "Verify ID with a government-issued photo ID.",
+          "Verify ID of witnisses if notarizing a will or self-proving affidavit",
           "Confirm signer understands the document.",
           "Ensure signer is acting willingly.",
           "Ensure both understand the language used.",
@@ -432,5 +514,6 @@ I certify this is a true and correct copy of a document presented to me on this 
       renderStep();
     });
   </script>
+  
 </body>
 </html>
