@@ -176,19 +176,19 @@ function generateCertificate() {
       body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty}, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
       break;
     case "selfprove-ron":
-      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me by means of communication technology.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me by means of communication technology.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
   break;
     case "selfprove-ipen":
-      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person and electronically signed.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person and electronically signed.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
   break;
     case "selfprove-physical":
-      body = `Before me, Elias Aaron Caldwell, Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person with ink signature.\n\n___________________________\nElias Aaron Caldwell, Notary Public\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
+      body = `Before me, Elias Aaron Caldwell, Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person with ink signature.\n\n___________________________\nElias Aaron Caldwell, Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
   break;
     default:
       body = "Please select a valid act.";
   }
 
-  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00005577\nMy commission expires: 03/26/2035\nSeal:
+  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:
 
 ___________________________`;
 
