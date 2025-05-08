@@ -2,518 +2,509 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Arkansas Notary Assistant – RON, IPEN & Special Circumstances</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        h1, h2, h3 { color: #3f51b5; }
-        .button-group { margin-bottom: 20px; }
-        button {
-            padding: 10px 15px; background-color: #3f51b5; color: white; border: none;
-            border-radius: 5px; margin-right: 10px; cursor: pointer;
-        }
-        button:hover { background-color: #2c3e90; }
-        .section {
-            display: none; background: white; padding: 20px; border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .section.active { display: block; }
-        .scroll-box {
-            max-height: 300px; overflow-y: auto; background: #eef;
-            padding: 15px; border-radius: 8px; margin-top: 10px; white-space: pre-wrap;
-        }
-        .template-box {
-            background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px;
-            border-radius: 8px; margin: 10px 0;
-        }
-        ul { line-height: 1.7; }
-    </style>
-    <script>
-        function toggleSection(id) {
-  document.getElementById('ron-checklist').classList.remove('active');
-    document.getElementById('cert-generator').classList.remove('active');
-            document.getElementById('ron').classList.remove('active');
-            document.getElementById('ipen').classList.remove('active');
-            document.getElementById('specials').classList.remove('active');
-            document.getElementById(id).classList.add('active');
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paramedic Protocol Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e3f2fd;
+      padding: 1em;
+      color: #0d47a1;
+    }
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+    }
+    select, input {
+      padding: 0.5em;
+      margin: 0.5em 0;
+      width: 100%;
+      font-size: 1em;
+    }
+    .protocol {
+      background: white;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 1em;
+      margin-bottom: 1em;
+    }
+    .protocol h3 {
+      margin-top: 0;
+    }
+    .protocol small {
+      color: #555;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Arkansas Notary Assistant</h1>
-<div class="button-group">
-<button onclick="toggleSection('ron-checklist')">RON Checklist</button>
+<style id="theme-style">
+</style>
 
-    <button onclick="toggleSection('ron')">Remote Online Notarization (RON)</button>
-    <button onclick="toggleSection('ipen')">In-Person Electronic Notarization (IPEN)</button>
-    <button onclick="toggleSection('specials')">Special Circumstances</button>
+<div style="text-align:right; margin-bottom: 0.5em;">
+  <button onclick="toggleDarkMode()" style="padding:0.5em 1em; background:#555; color:white; border:none; border-radius:5px; font-size:1em;">🌓 Toggle Dark Mode</button>
 </div>
-
-
-<div class="button-group">
-    <button onclick="toggleSection('cert-generator')">Generate Notarial Certificate</button>
-</div>
-
-<div id="cert-generator" class="section">
-  <h2>Notarial Certificate Generator (RON, IPEN, Physical)</h2>
-  “Original notarial certificate was noncompliant or incomplete. Attached certificate contains the correct notarial language based on the act performed and is compliant with Arkansas law.”​
-  
-  <label for="method">Select Notarial Method:</label>
-  <select id="method" style="width: 100%; margin-bottom: 10px;">
-    <option value="ron">Remote Online Notarization (RON)</option>
-    <option value="ipen">In-Person Electronic Notarization (IPEN)</option>
-    <option value="physical">Traditional Physical Notarization</option>
-  </select>
-
-  <label for="act">Select Notarial Act:</label>
-  <select id="act" onchange="toggleExtraFields()" style="width: 100%; margin-bottom: 10px;">
-    <option value="">-- Choose an act --</option>
-    <option value="ack-individual">Acknowledgment – Individual</option>
-    <option value="ack-representative">Acknowledgment – Representative</option>
-    <option value="jurat">Jurat</option>
-    <option value="oath">Oath / Affirmation</option>
-    <option value="copy-cert">Certified Copy</option>
-    <option value="sig-witness">Signature Witnessing</option>
-    <option value="mark">Signature by Mark</option>
-    <option value="third-party">Signature by Third Party</option>
-    <option value="refusal">Refusal to Notarize</option>
-    <option value="no-cert">No Certificate Provided</option>
-    <option value="selfprove-ron">Self-Proving Affidavit – RON</option>
-    <option value="selfprove-ipen">Self-Proving Affidavit – IPEN</option>
-    <option value="selfprove-physical">Self-Proving Affidavit – Physical</option>
-
-  </select>
-
-  <label for="signer">Signer’s Name:</label>
-  <input type="text" id="signer" style="width:100%; margin-bottom: 10px;"><br>
-
-  <label for="county">County You’re In:</label>
-  <input type="text" id="county" style="width:100%; margin-bottom: 10px;"><br>
-
-  <label for="date">Date:</label>
-  <input type="date" id="date" style="width:100%; margin-bottom: 10px;"><br>
-
-  <div id="extra-fields"></div>
-
-  <button onclick="generateCertificate()" style="margin-top:10px;">Generate Certificate</button>
-  <button onclick="downloadPDF()" style="margin-left: 10px;">Export to PDF</button>
-
-  <div class="scroll-box" id="output" style="margin-top:20px; white-space:pre-wrap;"></div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-function toggleExtraFields() {
-  const act = document.getElementById("act").value;
-  const extras = document.getElementById("extra-fields");
-  extras.innerHTML = "";
-
-  if (["ack-representative", "third-party"].includes(act)) {
-    extras.innerHTML += '<label for="principal">Principal’s Name:</label><input type="text" id="principal" style="width:100%; margin-bottom:10px;"><br>';
-  }
-  if (["mark", "third-party"].includes(act)) {
-    extras.innerHTML += '<label for="witnesses">Disinterested Witness(es):</label><input type="text" id="witnesses" style="width:100%; margin-bottom:10px;"><br>';
-  }
-  if (["third-party"].includes(act)) {
-    extras.innerHTML += '<label for="thirdparty">Third Party Signer’s Name:</label><input type="text" id="thirdparty" style="width:100%; margin-bottom:10px;"><br>';
-  }
-}
-
-function generateCertificate() {
-  const method = document.getElementById("method").value;
-  const act = document.getElementById("act").value;
-  const signer = document.getElementById("signer").value || "[Name of Signer]";
-  const county = document.getElementById("county").value || "[County]";
-  const date = document.getElementById("date").value || "[Date]";
-  const principal = document.getElementById("principal") ? document.getElementById("principal").value || "[Principal]" : "";
-  const witnesses = document.getElementById("witnesses") ? document.getElementById("witnesses").value || "[Witnesses]" : "";
-  const thirdparty = document.getElementById("thirdparty") ? document.getElementById("thirdparty").value || "[Third Party]" : "";
 
   
-  let notaryTitle = "Notary Public";
-  if (method === "ron" || method === "ipen") {
-    notaryTitle = "Electronic Notary Public";
-  }
-
-  let body = "";
-  let methodText = {
-    ron: "by means of communication technology",
-    ipen: "in person and electronically signed",
-    physical: "in person with ink signature"
-  };
-
-  switch (act) {
-    case "refusal":
-      body = `This is to certify that on ${date}, I, Elias Aaron Caldwell, ${notaryTitle} for the State of Arkansas, refused to notarize a document for ${signer} due to: [Reason].`;
-      break;
-    case "no-cert":
-      body = `This document, presented by ${signer} on ${date}, did not include a required notarial certificate. It was returned without notarization pending correction.`;
-      break;
-
-    case "ack-individual":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who appeared and affirmed that they are the individual who executed the record.`;
-      break;
-    case "ack-representative":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, as [Title/Capacity] for ${principal}, who affirmed that they executed the record in that capacity.`;
-      break;
-    case "jurat":
-      body = `Signed and sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who provided satisfactory evidence of identity.`;
-      break;
-    case "oath":
-      body = `Sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who affirmed the truth of the statement made.`;
-      break;
-    case "copy-cert":
-      body = `On ${date}, I certify that the attached is a true, correct, and complete copy of the original presented to me ${methodText[method]} by ${signer}.`;
-      break;
-    case "sig-witness":
-      body = `On ${date}, ${signer} appeared ${methodText[method]} and signed the document in my presence for the stated purpose.`;
-      break;
-    case "mark":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who signed by mark in the presence of ${witnesses}.`;
-      break;
-    case "third-party":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty}, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
-      break;
-    case "selfprove-ron":
-      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me by means of communication technology.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
-  break;
-    case "selfprove-ipen":
-      body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person and electronically signed.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
-  break;
-    case "selfprove-physical":
-      body = `Before me, Elias Aaron Caldwell, Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me in person with ink signature.\n\n___________________________\nElias Aaron Caldwell, Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
-  break;
-    default:
-      body = "Please select a valid act.";
-  }
-
-  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:
-
-___________________________`;
-
-  document.getElementById("output").innerText = cert;
-}
-
-function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const text = document.getElementById("output").innerText || "Please generate a certificate first.";
-  const lines = doc.splitTextToSize(text, 180);
-  doc.text(lines, 15, 20);
-  doc.save("Notarial_Certificate_Elias_Caldwell.pdf");
-}
-</script>
-
-
-
-
-<div id="ron" class="section active">
-    <h2>Remote Online Notarization (RON)</h2>
-    <ul>
-        <li>Confirm you’re in Arkansas and the signer is located in the U.S.</li>
-        <li>Use BlueNotary with KBA + credential verification.</li>
-        <li>Record session, verify ID, observe signing, attach RON certificate.</li>
-        <li>Apply e-seal and log the act in your journal.</li>
-    </ul>
-    <h3>RON Script</h3>
-    <div class="scroll-box">
-        Hello! My name is Elias Aaron Caldwell, and I’m a commissioned Remote Online Notary in the State of Arkansas. I'm authorized to perform this notarization remotely for documents intended for use anywhere in the United States. Before we begin, I'd like to address a few important points: *Proceed to ROM checklist*
-    </div>
-
-    <h3>RON Certificate Templates</h3>
-    <div class="template-box"><b>RON Jurat:</b><br>
-State of Arkansas<br>County of ________<br><br>
-Subscribed and sworn to before me by means of communication technology this ___ day of _______, 20__, by __________________, who appeared before me pursuant to Arkansas Code § 21-14-301.<br><br>Notary Public
-    </div>
-    <div class="template-box"><b>RON Acknowledgment:</b><br>
-State of Arkansas<br>County of ________<br><br>
-On this ___ day of _______, 20__, before me appeared __________________ via audio-visual communication, who acknowledged executing the document voluntarily under Arkansas Code § 21-14-301.<br><br>Notary Public
-    </div>
-    <div class="template-box"><b>RON Certified Copy:</b><br>
-State of Arkansas<br>County of ________<br><br>
-This is a true and correct copy of a document submitted to me remotely by __________________ on this ___ day of _______, 20__, per Arkansas Code § 21-14-301.<br><br>Notary Public
-    </div>
+<h1>Paramedic Protocol Assistant</h1>
+<div style="text-align: right;">
+  <button onclick="toggleFormModal()" style="padding:0.5em 1em; background:#0d47a1; color:white; border:none; border-radius:5px; font-size:1em;">+ Add New Protocol</button>
 </div>
 
-<div id="ipen" class="section">
-    <h2>In-Person Electronic Notarization (IPEN)</h2>
-    <ul>
-        <li>You and the signer must be physically present.</li>
-        <li>Use BlueNotary for e-signature and e-seal application.</li>
-        <li>Verify ID, observe signing, apply proper certificate.</li>
-        <li>Log the act in your journal (retain 5 years).</li>
-    </ul>
-    <h3>IPEN Script</h3>
-    <div class="scroll-box">
-        Hi, my name is [Your Name], and I’m a commissioned electronic notary public in Arkansas.
+  <label for="serviceFilter">Filter by Service:</label>
+  <select id="serviceFilter">
+    <option value="">All Services</option>
+  </select>
+  
+<label for="categoryFilter">Filter by Category:</label>
+<select id="categoryFilter">
+  <option value="">All Categories</option>
+</select>
+<input type="text" id="searchInput"
+ placeholder="Type a question or keyword..." />
 
-        We are physically present together today in [County Name], Arkansas, as required by law.
-        
-        Please present your valid government-issued ID.
-        [Verify ID and log in journal]
-        
-        Please review and sign the document electronically when ready.
-        Do you affirm that the contents are true and correct?
-        
-        I’ll now apply my eSeal and finalize this notarization. You will receive a copy of the completed document.
-    </div>
+  <div id="results"></div>
 
-    <h3>IPEN Certificate Templates</h3>
-    <div class="template-box"><b>Traditional Jurat:</b><br>
-Subscribed and sworn to before me this ___ day of _______, 20__, by __________________.<br><br>Notary Public
-    </div>
-    <div class="template-box"><b>Traditional Acknowledgment:</b><br>
-On this ___ day of _______, 20__, before me appeared __________________, who acknowledged executing the document.<br><br>Notary Public
-    </div>
-    <div class="template-box"><b>Certified Copy:</b><br>
-I certify this is a true and correct copy of a document presented to me on this ___ day of _______, 20__, by __________________.<br><br>Notary Public
-    </div>
-</div>
-
-<div id="specials" class="section">
-    <h2>Special Circumstances (Arkansas Handbook)</h2>
-    <h3>1. Signers Who Use a Mark</h3>
-    <ul>
-        <li>Two impartial witnesses must observe and sign the document and journal.</li>
-        <li>Certificate must say: “Signature affixed by mark in presence of [witness names].”</li>
-    </ul>
-    <h3>2. Physically Unable to Sign</h3>
-    <ul>
-        <li>Signer may direct a designee to sign.</li>
-        <li>Certificate must say: “Signature affixed by [Designee] at direction of [Signer].”</li>
-    </ul>
-    <h3>3. Interpreters</h3>
-    <ul>
-        <li>Permitted if the notary understands the interpreter’s language.</li>
-        <li>Interpreter identity must be logged in the journal.</li>
-    </ul>
-    <h3>4. Blind or Illiterate Signers</h3>
-    <ul>
-        <li>Document must be read aloud in full by the notary.</li>
-        <li>Signer must confirm understanding aloud.</li>
-    </ul>
-    <h3>5. Credible Witnesses</h3>
-    <ul>
-        <li>One or two disinterested witnesses may verify identity for signers lacking ID.</li>
-        <li>Witnesses must sign the journal and may be sworn under oath.</li>
-    </ul>
-    <h3>6. Wills and Witnesses</h3>
-<ul>
-  <li>A will must be signed by the testator and two competent witnesses in Arkansas.</li>
-  <li>Witnesses must be present at the same time for the testator’s signing and their own signing.</li>
-  <li>Witness ID verification is strongly recommended.</li>
-  <li>Self-Proving Affidavit notarization streamlines probate but is optional.</li>
-  <li>§ 28-25-102: Will must be written, signed by the testator (or by someone else at their direction if necessary).</li>
-  <li>§ 28-25-103: At least two (2) witnesses must watch the testator sign OR hear them acknowledge the signature.</li>
-  <li>AND the witnesses must sign in the presence of the testator and each other.</li>
-  <li>§ 28-25-106: (Optional) A notarized self-proving affidavit can be attached to avoid needing the witnesses to come to court later.</li>
-</ul>
-</div>
+  <script>
 
 
-</ul>
+function toggleFormModal() {
+  populateServiceAndCategoryDropdowns();
 
-<div id="ron-checklist" class="section">
-<div class="container">
-    <div id="ron-content"></div>
-    <div style="margin-top: 20px;">
-      <button class="btn" onclick="prevStep()">Back</button>
-      <button class="btn" onclick="nextStep()">Next</button>
-      <button class="btn" onclick="restart()">Restart</button>
-      <button class="btn" onclick="showReferences()">Notarial References</button>
-      <!-- BEGIN: Accordion Oath Scripts Section -->
-
-<div style="margin-top: 20px;">
-  <h3>Common Oath / Affirmation Scripts</h3>
-
-  <div style="margin-bottom: 10px;">
-    <button onclick="toggleOath('oath1')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Self-Proving Affidavit Oath</button>
-    <div id="oath1" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
-      "Do you solemnly swear or affirm, under penalty of perjury, that the document you have signed is your Last Will and Testament, that you signed it voluntarily, and that the witnesses signed in your presence and at your request?"
-    </div>
-  </div>
-
-  <div style="margin-bottom: 10px;">
-    <button onclick="toggleOath('oath2')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Standard Jurat Oath</button>
-    <div id="oath2" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
-      "Do you swear or affirm under penalty of perjury that the statements in this document are true and correct to the best of your knowledge and belief?"
-    </div>
-  </div>
-
-  <div style="margin-bottom: 10px;">
-    <button onclick="toggleOath('oath3')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Copy Certification Oath</button>
-    <div id="oath3" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
-      "Do you swear or affirm that the copy presented is a true, complete, and accurate reproduction of the original document?"
-    </div>
-  </div>
-
-  <div style="margin-bottom: 10px;">
-    <button onclick="toggleOath('oath4')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Signature by Mark Oath</button>
-    <div id="oath4" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
-      "Do you swear or affirm that you are signing this document voluntarily and understand its contents, with the assistance of the identified impartial witnesses?"
-    </div>
-  </div>
-
-  <div style="margin-bottom: 10px;">
-    <button onclick="toggleOath('oath5')" style="padding:8px; background-color:#3f51b5; color:white; border:none; border-radius:5px; cursor:pointer;">Show Third Party Signing Oath</button>
-    <div id="oath5" style="display:none; background:#eef; padding:10px; margin-top:5px; border-radius:8px;">
-      "Do you swear or affirm that you have authorized this individual to sign this document on your behalf, and that the signing is voluntary and made with your full consent?"
-    </div>
-  </div>
-
-</div>
-
-<script>
-function toggleOath(id) {
-  const oath = document.getElementById(id);
-  if (oath.style.display === "none") {
-    oath.style.display = "block";
-  } else {
-    oath.style.display = "none";
+  const modal = document.getElementById("entryModal");
+  if (modal) {
+    modal.style.display = modal.style.display === "none" ? "block" : "none";
   }
 }
-</script>
+    const protocols = [
+  {
+    "service": "Pafford EMS \u2013 Arkansas",
+    "category": "Admin \u2013 General",
+    "title": "Medical Director",
+    "content": [
+      "Pafford's Primary Medical Director is Michael Seymour.",
+      "Pafford's Associate Medical Director is Karl Wagenhauser."
+    ],
+    "last_updated": "May 08, 2025"
+  },
+  {
+    "service": "Pafford EMS \u2013 Arkansas",
+    "category": "Universal Care Guidelines",
+    "title": "Pediatric Considerations",
+    "content": [
+      "Pediatric Protocols are applicable to patients below 14 years of age and/or weigh > 40 KG, whichever comes first."
+    ],
+    "last_updated": "May 08, 2025"
+  },
+  {
+    "service": "Pafford EMS \u2013 Arkansas",
+    "category": "Universal Care Guidelines",
+    "title": "Geriatric Considerations",
+    "content": [
+      "Geriatric Protocols are applicable to patients who are 65 years of age or older."
+    ],
+    "last_updated": "May 08, 2025"
+  },
+  {
+    "service": "Pafford EMS \u2013 Arkansas",
+    "category": "Universal Care Guidelines",
+    "title": "Reduced Medication Doses",
+    "content": [
+      "Reduced medication doses apply to patients with renal disease, hepatic disease (liver), pediatrics, and/or geriatrics."
+    ],
+    "last_updated": "May 08, 2025"
+  },
+  {
+    "service": "Pafford EMS \u2013 Arkansas",
+    "category": "Universal Care Guidelines",
+    "title": "Reduced Medication Doses",
+    "content": [
+      "Reduced medication doses apply to patients with renal disease, hepatic disease (liver), pediatrics, and/or geriatrics."
+    ],
+    "last_updated": "May 08, 2025"
+  }
+  
+];
 
-<!-- END: Accordion Oath Scripts Section -->
-    </div>
-    <div id="reference" class="hidden">
-      <h2>Notarial Acts & Key Requirements</h2>
-      <div id="ref-data"></div>
-      <button class="btn" onclick="hideReferences()">Close</button>
-    </div>
-  </div>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const steps = [
-        "Hello! My name is Elias Aaron Caldwell, and I'm a commissioned Remote Online Notary in Arkansas...",
-        "Do you understand and consent to proceeding with this remote online notarization today in Arkansas?",
-        "Do you understand that this session will be recorded as part of the legal notarial record?",
-        "Are you participating of your own free will?",
-        "Do you understand the contents of the document you are about to sign?",
-        "Do you agree to use an electronic signature for this document?",
-        "Do you understand that by signing electronically, you are legally binding yourself to the terms of the document just as you would with a handwritten signature?",
-        "Checklist: Identity Verification",
-        "Checklist: Certificate Completion",
-        "Checklist: Journal Entry",
-        "✅ You have completed the RON Checklist!"
-      ];
-      const checklists = {
-        7: [
-          "Verify ID with a government-issued photo ID.",
-          "Verify ID of witnisses if notarizing a will or self-proving affidavit",
-          "Confirm signer understands the document.",
-          "Ensure signer is acting willingly.",
-          "Ensure both understand the language used.",
-          "Confirm document is complete (no blanks).",
-          "Confirm correct notarial act."
-        ],
-        8: [
-          "Ensure certificate is attached or correct.",
-          "Check venue, date, and signer's name.",
-          "Sign using your commissioned name.",
-          "Affix official seal."
-        ],
-        9: [
-          "Log date/time of notarization.",
-          "Record document type & act performed.",
-          "Record signer’s name, address, and signature.",
-          "Record ID used.",
-          "Note special circumstances if any.",
-          "Record fee charged (if any)."
-        ]
-      };
-      let currentStep = 0;
+    
+function populateServiceFilter() {
+      const categories = [...new Set(protocols.map(p => p.category))];
+      const categorySelect = document.getElementById("categoryFilter");
+      categorySelect.innerHTML = '<option value="">All Categories</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
 
-      function renderStep() {
-        const container = document.getElementById('ron-content');
-        container.classList.remove("hidden");
-        document.getElementById('reference').classList.add('hidden');
-        container.innerHTML = `<h2>Step ${currentStep + 1}</h2><p>${steps[currentStep]}</p>`;
-        if (checklists[currentStep]) {
-          checklists[currentStep].forEach(item => {
-            container.innerHTML += `<div class='checkbox'><label><input type='checkbox'/> ${item}</label></div>`;
-          });
-        }
-      }
 
-      window.nextStep = function () {
-        if (currentStep < steps.length - 1) {
-          currentStep++;
-          renderStep();
-        }
-      };
+      const services = [...new Set(protocols.map(p => p.service))];
+      const select = document.getElementById('serviceFilter');
+      services.forEach(service => {
+        const option = document.createElement('option');
+        option.value = service;
+        option.textContent = service;
+        select.appendChild(option);
+      });
+    }
 
-      window.prevStep = function () {
-        if (currentStep > 0) {
-          currentStep--;
-          renderStep();
-        }
-      };
+    function searchProtocols() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const serviceFilter = document.getElementById("serviceFilter").value;
+      const categoryFilter = document.getElementById("categoryFilter").value;
+      const results = document.getElementById('results');
+      results.innerHTML = '';
 
-      window.restart = function () {
-        currentStep = 0;
-        renderStep();
-      };
+      const matched = protocols.filter(p => {
+        const inService = !serviceFilter || p.service === serviceFilter;
+        const inContent = (p.title + p.category + p.content.join(' ')).toLowerCase().includes(query);
+        const inCategory = !categoryFilter || p.category === categoryFilter;
+        return inService && inCategory && inContent;
+      });
 
-      window.showReferences = function () {
-        document.getElementById('ron-content').classList.add('hidden');
-        document.getElementById('reference').classList.remove('hidden');
-        renderReferences();
-      };
+      matched.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'protocol';
+        div.innerHTML = `
+          <h3>${p.title}</h3>
+          <small><strong>Service:</strong> ${p.service}<br>
+          <strong>Category:</strong> ${p.category}<br>
+          <strong>Last Updated:</strong> ${p.last_updated}</small>
+          <ul>${p.content.map(c => `<li>${c}</li>`).join('')}</ul>
+        `;
+        results.appendChild(div);
+      });
+    }
 
-      window.hideReferences = function () {
-        document.getElementById('reference').classList.add('hidden');
-        document.getElementById('ron-content').classList.remove('hidden');
-        renderStep();
-      };
+    document.getElementById('searchInput').addEventListener('input', searchProtocols);
+    document.getElementById('serviceFilter').addEventListener('change', searchProtocols);
 
-      function renderReferences() {
-        const data = {
-          "Acknowledgment": [
-            "Signer may sign before or in notary's presence.",
-            "No oath required.",
-            "Must appear in person or via remote tech."
-          ],
-          "Jurat": [
-            "Signer must sign in notary’s presence.",
-            "Oath or affirmation is required.",
-            "Identity must be verified."
-          ],
-          "Oath/Affirmation": [
-            "Verbal act only. No signature required.",
-            "Person must appear before notary."
-          ],
-          "Copy Certification": [
-            "Notary must supervise or create copy.",
-            "Not valid for vital/public records."
-          ],
-          "Signature by Mark": [
-            "Signer uses a mark instead of full signature.",
-            "Requires 1 disinterested witness.",
-            "Certificate must note witness and mark."
-          ],
-          "Signature by Third Party": [
-            "Signer directs another to sign for them.",
-            "Requires 2 disinterested witnesses.",
-            "All must be present and certificate must reflect this."
-          ],
-          "Special Circumstances": [
-            "Used for disability or inability to sign.",
-            "Notarial certificate must include specific language.",
-            "Witness rules apply as described above."
-          ]
-        };
-        const ref = document.getElementById("ref-data");
-        ref.innerHTML = Object.entries(data).map(([title, list]) => `
-          <h3>${title}</h3><ul>${list.map(item => `<li>${item}</li>`).join("")}</ul>
-        `).join("");
-      }
-
-      renderStep();
-    });
+    populateServiceFilter();
+    searchProtocols();
   </script>
+
+  <hr />
   
+  
+<div id="entryModal" style="display:none; position:fixed; top:5%; left:5%; width:90%; max-height:90%; overflow:auto; background:white; border:2px solid #0d47a1; border-radius:10px; padding:1em; z-index:9999; box-shadow: 0 0 10px rgba(0,0,0,0.2);">
+  <div style="text-align:right;"><button onclick="toggleFormModal()" style="background:none; border:none; font-size:1.2em;">✖</button></div>
+  <h2>Add New Protocol</h2>
+
+    
+    <label>Service:</label>
+    <select id="newService" onchange="populateCategoryDropdown()" style="width:100%;"></select><br>
+    <label>Category:</label>
+    <select id="newCategory" style="width:100%;"></select><br>
+    
+    <label>Title:</label><input type="text" id="newTitle"><br>
+    <label>Content (one item per line):</label><textarea id="newContent" rows="5" style="width:100%;"></textarea><br>
+    <label>Last Updated:</label><input type="date" id="newDate"><br>
+    <button onclick="addProtocol()" style="margin-top:0.5em;">Save Protocol</button>
+    <button onclick="exportProtocols()" style="margin-top:0.5em;">Export Protocols (JSON)</button>
+    <pre id="exportedData" style="white-space:pre-wrap; background:white; padding:1em; border-radius:5px; display:none; margin-top:1em;"></pre>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const form = document.getElementById("entryForm");
+      
+    if (form.style.display === "none") {
+      form.style.display = "block";
+      form.scrollIntoView({ behavior: "smooth" });
+    } else {
+      form.style.display = "none";
+    }
+    
+    }
+
+    function addProtocol() {
+      const service = document.getElementById("newService").value.trim();
+      const category = document.getElementById("newCategory").value.trim();
+      const title = document.getElementById("newTitle").value.trim();
+      const contentText = document.getElementById("newContent").value.trim();
+      const date = document.getElementById("newDate").value || new Date().toISOString().slice(0, 10);
+
+      if (!service || !category || !title || !contentText) {
+        alert("All fields must be filled out.");
+        return;
+      }
+
+      const newProtocol = {
+        service,
+        category,
+        title,
+        content: contentText.split("\n").filter(line => line.trim()),
+        last_updated: new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      };
+
+      protocols.push(newProtocol);
+      populateServiceFilter();
+      searchProtocols();
+      alert("Protocol added!");
+    }
+
+    function exportProtocols() {
+      const exportBox = document.getElementById("exportedData");
+      exportBox.style.display = "block";
+      exportBox.textContent = JSON.stringify(protocols, null, 2);
+    }
+  </script>
+
+<div style="text-align:right; margin-top:1em;">
+  <button onclick="startQuiz()" style="padding:0.5em 1em; background:#388e3c; color:white; border:none; border-radius:5px; font-size:1em;">🧪 Start Quiz</button>
+</div>
+
+<div id="quizModal" style="display:none; position:fixed; top:5%; left:5%; width:90%; max-height:90%; overflow:auto; background:white; border:2px solid #0d47a1; border-radius:10px; padding:1em; z-index:9999;">
+  <div style="text-align:right;"><button onclick="closeQuiz()" style="background:none; border:none; font-size:1.2em;">✖</button></div>
+  <h2>Protocol Quiz</h2>
+  <label>Service:</label>
+  <select id="quizService">
+    <option value="Pafford EMS – Arkansas">Pafford EMS – Arkansas</option>
+  </select>
+  <label>Category:</label>
+  <select id="quizCategory">
+    <option value="Universal Care Guidelines">Universal Care Guidelines</option>
+  </select>
+  <button onclick="beginQuiz()" style="margin-top:1em;">Begin</button>
+  <div id="quizBox" style="margin-top:1em;"></div>
+</div>
+
+<script>
+const quizQuestions = [
+  {
+    service: "Pafford EMS – Arkansas",
+    category: "Universal Care Guidelines",
+    question: "What is the age cutoff for pediatric protocols?",
+    options: ["Under 18 years old", "Below 14 years of age and/or < 40kg", "Under 12 years old"],
+    answer: "Below 14 years of age and/or < 40kg",
+    reference: "Pediatric Protocols are applicable to patients below 14 years of age and/or weigh > 40 KG, whichever comes first."
+  },
+  {
+    service: "Pafford EMS – Arkansas",
+    category: "Universal Care Guidelines",
+    question: "Who qualifies for reduced medication doses?",
+    options: ["Only pediatric patients", "Anyone over 60", "Renal/hepatic disease, pediatric, or geriatric patients"],
+    answer: "Renal/hepatic disease, pediatric, or geriatric patients",
+    reference: "Reduced medication doses apply to patients with renal disease, hepatic disease (liver), pediatrics, and/or geriatrics."
+  }
+];
+
+let currentQuiz = [];
+let quizIndex = 0;
+let score = 0;
+
+function startQuiz() {
+  document.getElementById("quizModal").style.display = "block";
+}
+
+function closeQuiz() {
+  document.getElementById("quizModal").style.display = "none";
+  document.getElementById("quizBox").innerHTML = "";
+  quizIndex = 0;
+  score = 0;
+}
+
+function beginQuiz() {
+  const service = document.getElementById("quizService").value;
+  const category = document.getElementById("quizCategory").value;
+  currentQuiz = quizQuestions.filter(q => q.service === service && q.category === category);
+  quizIndex = 0;
+  score = 0;
+  document.getElementById("quizBox").innerHTML = "";
+  showNextQuestion();
+}
+
+function showNextQuestion() {
+  const box = document.getElementById("quizBox");
+  if (quizIndex >= currentQuiz.length) {
+    box.innerHTML = `<h3>Quiz Complete</h3><p>You got ${score} out of ${currentQuiz.length} correct.</p>`;
+    return;
+  }
+  const q = currentQuiz[quizIndex];
+  box.innerHTML = `
+    <h4>${q.question}</h4>
+    ${q.options.map(opt => `<button onclick="checkAnswer('${opt.replace(/'/g, "\'")}')" style="margin:0.25em; display:block;">${opt}</button>`).join("")}
+  `;
+}
+
+function checkAnswer(selected) {
+  const q = currentQuiz[quizIndex];
+  const box = document.getElementById("quizBox");
+  const correct = selected === q.answer;
+  if (correct) score++;
+  box.innerHTML = `
+    <h4>${q.question}</h4>
+    <p><strong>Your Answer:</strong> ${selected}</p>
+    <p style="color:${correct ? 'green' : 'red'};"><strong>${correct ? 'Correct!' : 'Incorrect.'}</strong></p>
+    <p><strong>Protocol Reference:</strong><br>${q.reference}</p>
+    <button onclick="nextQuestion()">Next</button>
+  `;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  showNextQuestion();
+}
+</script>
+
+</body>
+</html>
+
+</html>
+
+
+
+<style id="theme-style"></style>
+<style>
+  .dark-mode {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+  }
+  .dark-mode button, .dark-mode select, .dark-mode input, .dark-mode textarea {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+  }
+</style>
+<script>
+function toggleDarkMode() {
+  const styleTag = document.getElementById("theme-style");
+  const isDark = styleTag.innerHTML.includes("background-color: #121212");
+  const entryModal = document.getElementById("entryModal");
+  const quizModal = document.getElementById("quizModal");
+
+  if (isDark) {
+    styleTag.innerHTML = "";
+    entryModal && entryModal.classList.remove("dark-mode");
+    quizModal && quizModal.classList.remove("dark-mode");
+  } else {
+    styleTag.innerHTML = `
+      body { background-color: #121212; color: #e0e0e0; }
+      .protocol { background-color: #1e1e1e; border-color: #444; }
+      select, input, textarea, button {
+        background-color: #333; color: #e0e0e0; border-color: #555;
+      }
+      button:hover {
+        background-color: #444;
+      }
+    `;
+    entryModal && entryModal.classList.add("dark-mode");
+    quizModal && quizModal.classList.add("dark-mode");
+  }
+}
+</script>
+
+
+<script>
+function populateServiceAndCategoryDropdowns() {
+  const services = [...new Set(protocols.map(p => p.service))];
+  const serviceSelect = document.getElementById("newService");
+  serviceSelect.innerHTML = '<option value="">Select Service</option>';
+  services.forEach(service => {
+    const opt = document.createElement("option");
+    opt.value = service;
+    opt.textContent = service;
+    serviceSelect.appendChild(opt);
+  });
+  populateCategoryDropdown();
+}
+
+function populateCategoryDropdown() {
+  const selectedService = document.getElementById("newService").value;
+  const categories = [
+    ...new Set(
+      protocols.filter(p => p.service === selectedService).map(p => p.category)
+    )
+  ];
+  const categorySelect = document.getElementById("newCategory");
+  categorySelect.innerHTML = '<option value="">Select Category</option>';
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+}
+</script>
+
+
+<script>
+function generateQuizQuestions(service, category) {
+  const relevant = protocols.filter(p => p.service === service && p.category === category);
+  const lines = relevant.flatMap(p => p.content.map(line => ({
+    question: `What does the protocol say about '${p.title}'?`,
+    answer: line,
+    reference: line
+  })));
+
+  return lines.map(q => {
+    const distractors = lines.filter(l => l.reference !== q.reference).map(l => l.reference);
+    const sampled = distractors.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const options = [q.answer, ...sampled].sort(() => 0.5 - Math.random());
+    return { ...q, service, category, options };
+  });
+}
+
+let currentQuiz = [];
+let quizIndex = 0;
+let score = 0;
+
+function startQuiz() {
+  document.getElementById("quizModal").style.display = "block";
+}
+
+function closeQuiz() {
+  document.getElementById("quizModal").style.display = "none";
+  document.getElementById("quizBox").innerHTML = "";
+  quizIndex = 0;
+  score = 0;
+}
+
+function beginQuiz() {
+  const service = document.getElementById("quizService").value;
+  const category = document.getElementById("quizCategory").value;
+  currentQuiz = generateQuizQuestions(service, category);
+  quizIndex = 0;
+  score = 0;
+  document.getElementById("quizBox").innerHTML = "";
+  showNextQuestion();
+}
+
+function showNextQuestion() {
+  const box = document.getElementById("quizBox");
+  if (quizIndex >= currentQuiz.length) {
+    box.innerHTML = `<h3>Quiz Complete</h3><p>You got ${score} out of ${currentQuiz.length} correct.</p>`;
+    return;
+  }
+  const q = currentQuiz[quizIndex];
+  box.innerHTML = `
+    <h4>${q.question}</h4>
+    ${q.options.map(opt => `<button onclick="checkAnswer('${opt.replace(/'/g, "\'")}')" style="margin:0.25em; display:block;">${opt}</button>`).join("")}
+  `;
+}
+
+function checkAnswer(selected) {
+  const q = currentQuiz[quizIndex];
+  const box = document.getElementById("quizBox");
+  const correct = selected === q.answer;
+  if (correct) score++;
+  box.innerHTML = `
+    <h4>${q.question}</h4>
+    <p><strong>Your Answer:</strong> ${selected}</p>
+    <p style="color:${correct ? 'green' : 'red'};"><strong>${correct ? 'Correct!' : 'Incorrect.'}</strong></p>
+    <p><strong>Protocol Reference:</strong><br>${q.reference}</p>
+    <button onclick="nextQuestion()">Next</button>
+  `;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  showNextQuestion();
+}
+</script>
+
 </body>
 </html>
