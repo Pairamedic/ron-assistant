@@ -125,7 +125,10 @@ function generateCertificate() {
   const act = document.getElementById("act").value;
   const signer = document.getElementById("signer").value || "[Name of Signer]";
   const county = document.getElementById("county").value || "[County]";
-  const date = document.getElementById("date").value || "[Date]";
+  const rawDate = document.getElementById("date").value;
+  const date = rawDate
+  ? (() => { const [y, m, d] = rawDate.split("-"); return `${m}/${d}/${y}`; })()
+  : "[Date]";
   const principal = document.getElementById("principal") ? document.getElementById("principal").value || "[Principal]" : "";
   const witnesses = document.getElementById("witnesses") ? document.getElementById("witnesses").value || "[Witnesses]" : "";
   const thirdparty = document.getElementById("thirdparty") ? document.getElementById("thirdparty").value || "[Third Party]" : "";
@@ -152,16 +155,16 @@ function generateCertificate() {
       break;
 
     case "ack-individual":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who appeared and affirmed that they are the individual who executed the record.`;
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer} pursuant to Arkansas Code § 21-14-301, who appeared and affirmed that they are the individual who executed the record.`;
       break;
     case "ack-representative":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, as [Title/Capacity] for ${principal}, who affirmed that they executed the record in that capacity.`;
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer} pursuant to Arkansas Code § 21-14-301, as [Title/Capacity] for ${principal}, who affirmed that they executed the record in that capacity.`;
       break;
     case "jurat":
-      body = `Signed and sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who provided satisfactory evidence of identity.`;
+      body = `Signed and sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer} pursuant to Arkansas Code § 21-14-301, who provided satisfactory evidence of identity.`;
       break;
     case "oath":
-      body = `Sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer}, who affirmed the truth of the statement made.`;
+      body = `Sworn to (or affirmed) before me ${methodText[method]} on ${date} by ${signer} pursuant to Arkansas Code § 21-14-301, who affirmed the truth of the statement made.`;
       break;
     case "copy-cert":
       body = `On ${date}, I certify that the attached is a true, correct, and complete copy of the original presented to me ${methodText[method]} by ${signer}.`;
@@ -170,10 +173,10 @@ function generateCertificate() {
       body = `On ${date}, ${signer} appeared ${methodText[method]} and signed the document in my presence for the stated purpose.`;
       break;
     case "mark":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer}, who signed by mark in the presence of ${witnesses}.`;
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${signer} pursuant to Arkansas Code § 21-14-301, who signed by mark in the presence of ${witnesses}.`;
       break;
     case "third-party":
-      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty}, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
+      body = `This record was acknowledged before me ${methodText[method]} on ${date} by ${thirdparty} pursuant to Arkansas Code § 21-14-301, signing on behalf of ${principal}, at their direction, with ${witnesses} present.`;
       break;
     case "selfprove-ron":
       body = `Before me, Elias Aaron Caldwell, Electronic Notary Public for the State of Arkansas, on this ${date}, appeared ${signer}, testator, and the attesting witnesses, who, being duly sworn, stated that the testator declared this instrument to be their will, and that they each witnessed the signing willingly by the testator.\n\nSubscribed and sworn to before me by means of communication technology.\n\n___________________________\nElias Aaron Caldwell, Electronic Notary Public\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:\n___________________________`;
@@ -188,9 +191,7 @@ function generateCertificate() {
       body = "Please select a valid act.";
   }
 
-  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:
-
-___________________________`;
+  const cert = `State of Arkansas\nCounty of ${county}\n\n${body}\n\n___________________________\nElias Aaron Caldwell, ${notaryTitle}\nCommission #: 00006077\nMy commission expires: 03/26/2035\nSeal:                                                                `;
 
   document.getElementById("output").innerText = cert;
 }
