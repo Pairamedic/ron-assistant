@@ -125,10 +125,7 @@ function generateCertificate() {
   const act = document.getElementById("act").value;
   const signer = document.getElementById("signer").value || "[Name of Signer]";
   const county = document.getElementById("county").value || "[County]";
-  const rawDate = document.getElementById("date").value;
-  const date = rawDate
-  ? new Date(rawDate).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' })
-  : "[Date]";
+  const date = document.getElementById("date").value || "[Date]";
   const principal = document.getElementById("principal") ? document.getElementById("principal").value || "[Principal]" : "";
   const witnesses = document.getElementById("witnesses") ? document.getElementById("witnesses").value || "[Witnesses]" : "";
   const thirdparty = document.getElementById("thirdparty") ? document.getElementById("thirdparty").value || "[Third Party]" : "";
